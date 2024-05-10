@@ -5,10 +5,16 @@ import Header from './Header';
 
 
 const Country = () => {
-    const[country,setCountry] = useState('');
+    const[country,setCountry] = useState([]);
     const[searchData,setSearchData] = useState([])
-    
+    const[input,setInput] = useState('')
 
+    const inputHandler = (e) =>{
+        // let searchValue = e.target.value;
+        setInput(e.target.value);
+        // applyFilter(searchValue)
+    }
+    let filterData = country.filter(items=>items.name.common.toLowerCase().includes(input.toLowerCase()))
   const getFlagData = async() =>{
     try {
         let result = await fetch('https://restcountries.com/v3.1/all')
@@ -22,9 +28,11 @@ const Country = () => {
    
     }
 
-    const HeaderData = (childValue) =>{
-      if(childValue){
-        let filterData = country.filter(items=>items.name.common.toLowerCase().includes(childValue.toLowerCase()))
+    const applyFilter = (childValue) =>{
+      const flagData = JSON.parse(JSON.stringify(country))
+      childValue = childValue.trim()
+      if(childValue !== ''){
+        let filterData = flagData.filter(items=>items.name.common.toLowerCase().includes(childValue.toLowerCase()))
         setSearchData(filterData)
       }else{
         setSearchData([])
@@ -36,7 +44,9 @@ const Country = () => {
         }
 
     }
-        
+    // useEffect(() =>{
+    //   applyFilter(input)
+    // },[input])    
 
     useEffect(()=>{
         getFlagData()
@@ -44,12 +54,15 @@ const Country = () => {
     },[])
   return (
     <>
-    <div>
+    {/* <div>
     <Header applyFilter={HeaderData}/>
+    </div> */}
+     <div className="header">
+      <input className="headerInput" type='text' value={input} onChange={inputHandler}/>
     </div>
 
     <div className='row'>
-        {country.length>0 ? (country.map(items=> <Card imgUrl={items.flags.png} name={items.name.common} altUrl={items.flags.alt} />)):('')}
+        {country.length>0 ? (filterData.map(items=> <Card imgUrl={items.flags.png} name={items.name.common} altUrl={items.flags.alt} />)):('')}
         
     </div>
     </>
